@@ -36,3 +36,24 @@
     transform: rotate(360deg);
   }
 }
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 500px; /* Set the desired max height */
+  overflow-y: auto; /* Enables vertical scrolling */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+}
+
+/* Style for individual message cards */
+.message-card {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

@@ -30,7 +30,7 @@ function App() {
       // after clicking on search emptying the textfield state
       setQuery('');
       // sending the recent query message to the server using socket.emit() method
-      socket.emit('message', chats);
+      socket.emit('message', newChat);
     } else {
       // if socket is not connected then throw this error
       setError('Client Socket is disconnected');

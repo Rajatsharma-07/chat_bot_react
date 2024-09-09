@@ -24,11 +24,10 @@ Follow these steps to set up and run the project locally:
     ```bash
     npm start
 
-    This will start the ReactJs application at http://localhost:3000 Default Port:3000
+This will start the ReactJs application at http://localhost:3000 Default Port:3000
     
 # Technologies Used
-TypeScript
-ReactJs
+TypeScript | ReactJs
 
 # Note
 Please create the env file from env.sample or rename the env.sample file to .env

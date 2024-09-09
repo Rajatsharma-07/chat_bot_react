@@ -1,5 +1,5 @@
 import { Button, Card, CardContent, Container, Stack, TextField, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import useSocket from './hooks/useSocket';
 
@@ -9,6 +9,10 @@ function App() {
   const [error, setError] = useState('');
   const [loader, setLoader] = useState(false);
   const socket = useSocket(process.env.REACT_APP_HOST_BACKEND || "");
+
+  // Create a ref to the chat container
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
   const onSearch = () => {
     if (socket) {
       setLoader(true);
@@ -39,6 +43,12 @@ function App() {
     }
   }, [socket, chats])
 
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chats]);
+
   return (
     <div className="App">
       <Container sx={{ my: 2 }}>
@@ -55,6 +65,7 @@ function App() {
           }}
         >
           <CardContent
+            ref={chatContainerRef}
             sx={{
               flexGrow: 1,
               overflowY: 'auto',
@@ -80,7 +91,7 @@ function App() {
                   marginBottom: 1, // Adds space between each message
                 }}
               >
-                  {chat.message}
+                {chat.message}
               </Card>
             ))}
           </CardContent>

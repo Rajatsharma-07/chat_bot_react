@@ -4,33 +4,42 @@ import './App.css';
 import useSocket from './hooks/useSocket';
 
 function App() {
-  const [query, setQuery] = useState<string>('');
-  const [chats, setChats] = useState<any>([]);
-  const [error, setError] = useState('');
-  const [loader, setLoader] = useState(false);
-  const socket = useSocket(process.env.REACT_APP_HOST_BACKEND || "");
+  const [query, setQuery] = useState<string>(''); //This state is used for the textfield(search field)
+  const [chats, setChats] = useState<any>([]); //This state is use to display the chats between the current_user and AI
+  const [error, setError] = useState(''); //This state is used to display error in case when socket is not connected
+  const [loader, setLoader] = useState(false); //Loader state to show the Loading response card after sending the request to backend
+  const socket = useSocket(process.env.REACT_APP_HOST_BACKEND || ""); //custom hook to connect with client socket with server 
 
   // Create a ref to the chat container
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
+  //This method is called when we click on search button
   const onSearch = () => {
+    //first checks if the client socket is connected else will throw the error
     if (socket) {
+      // Sets the loader to true
       setLoader(true);
+      // deep copying the chats state into new variable
       let newChat = JSON.parse(JSON.stringify(chats));
+      // pushing the new query asked by current user to chats array
       newChat.push({
         user: 'current',
         message: query
       });
       setChats(newChat);
+      // after clicking on search emptying the textfield state
       setQuery('');
-      socket.emit('message', chats);
+      // sending the recent query message to the server using socket.emit() method
+      socket.emit('message', newChat);
     } else {
-      setError('Something went wrong!')
+      // if socket is not connected then throw this error
+      setError('Client Socket is disconnected');
     }
   }
 
   useEffect(() => {
     if (socket) {
+      // Appends the message recieved from open ai server to the chats state array
       socket.on('message', (message) => {
         let newChat = JSON.parse(JSON.stringify(chats));
         newChat.push({
@@ -40,9 +49,13 @@ function App() {
         setChats(newChat);
         setLoader(false);
       })
+    } else {
+      // if socket is not connected then throw this error
+      setError('Client Socket is disconnected');
     }
   }, [socket, chats])
 
+  // This useEffect will ensures that user always remain at the bottom of the chat
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -53,6 +66,7 @@ function App() {
     <div className="App">
       <Container sx={{ my: 2 }}>
         <Typography variant='h3' sx={{ my: 4 }}>Chat Bot Application</Typography>
+        {/* Parent Card */}
         <Card
           sx={{
             border: '2px solid green',
@@ -64,6 +78,7 @@ function App() {
             background: 'rgba(0, 200, 0, 0.1)',
           }}
         >
+          {/* This card content will render the messages in cards */}
           <CardContent
             ref={chatContainerRef}
             sx={{
@@ -74,6 +89,8 @@ function App() {
               flexDirection: 'column'
             }}
           >
+            {/* looping over the chats and if the author of chat is user i.e, current then they are displyed on left else if the chat is from the server
+             then they are displayed on right */}
             {chats.map((chat: { user: string; message: string }, index: number) => (
               <Card
                 key={index}
@@ -96,7 +113,7 @@ function App() {
             ))}
           </CardContent>
 
-          {/* Input area */}
+          {/* Input area which is stick to the bottom of parent card and contains a textfield, search button and "Loading Response..." card */}
           <Stack spacing={2} sx={{ padding: 2 }}>
             {loader && (
               <Card

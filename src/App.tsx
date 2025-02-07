@@ -23,8 +23,8 @@ function App() {
       let newChat = JSON.parse(JSON.stringify(chats));
       // pushing the new query asked by current user to chats array
       newChat.push({
-        user: 'current',
-        message: query
+        role: 'user',
+        content: query
       });
       setChats(newChat);
       // after clicking on search emptying the textfield state
@@ -41,10 +41,11 @@ function App() {
     if (socket) {
       // Appends the message recieved from open ai server to the chats state array
       socket.on('message', (message) => {
+        console.log('meesage', message);
         let newChat = JSON.parse(JSON.stringify(chats));
         newChat.push({
-          user: 'AI',
-          message: message
+          role: 'assistant',
+          content: message.choices[0]?.message.content
         });
         setChats(newChat);
         setLoader(false);
@@ -91,14 +92,14 @@ function App() {
           >
             {/* looping over the chats and if the author of chat is user i.e, current then they are displyed on left else if the chat is from the server
              then they are displayed on right */}
-            {chats.map((chat: { user: string; message: string }, index: number) => (
+            {chats.map((chat: { role: string; content: string }, index: number) => (
               <Card
                 key={index}
                 sx={{
                   display: 'flex',
-                  alignSelf: chat.user === 'current' ? 'flex-end' : 'flex-start',
-                  background: chat.user === 'current' ? 'whitesmoke' : 'rgb(0,60,0,0.7)',
-                  color: chat.user === 'current' ? 'black' : 'white',
+                  alignSelf: chat.role === 'user' ? 'flex-end' : 'flex-start',
+                  background: chat.role === 'user' ? 'whitesmoke' : 'rgb(0,60,0,0.7)',
+                  color: chat.role === 'user' ? 'black' : 'white',
                   margin: 2,
                   padding: 2,
                   overflow: 'visible',
@@ -108,7 +109,7 @@ function App() {
                   marginBottom: 1, // Adds space between each message
                 }}
               >
-                {chat.message}
+                {chat.content}
               </Card>
             ))}
           </CardContent>
